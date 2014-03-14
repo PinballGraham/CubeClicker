@@ -25,14 +25,15 @@ public:
 	static int Total();
 	
 private:
-	static uint Add(uint hash, const QString& str);
+	StringDeduplicator(const StringDeduplicator& src);
+	StringDeduplicator& operator=(const StringDeduplicator& src);
 
 	static StringDeduplicator* m_Instance;
 	
+	static uint Add(uint hash, const QString& str);
+
 	typedef QMap<uint, QString> DeduplicatorMap;
 	
 	DeduplicatorMap m_Strings;
 	
-	StringDeduplicator(const StringDeduplicator& src);
-	StringDeduplicator& operator=(const StringDeduplicator& src);
 };

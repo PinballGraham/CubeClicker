@@ -162,7 +162,7 @@ int DataHierarchy::AllAttributes(QList<uint>& destAttribIds) const
 
 bool DataHierarchy::Set(const QString& attrib, const QString& basicValue)
 {
-	uint attribHash = StringDeduplicator::Store(attrib);
+	uint attribHash = StringDeduplicator::StoreNoCase(attrib);
 	return Set(attribHash, basicValue);
 }
 
@@ -180,7 +180,7 @@ bool DataHierarchy::Set(const QString& attrib, DataHierarchy* structValue)
 	
 	if (structValue)
 	{
-		uint attribHash = StringDeduplicator::Store(attrib);
+		uint attribHash = StringDeduplicator::StoreNoCase(attrib);
 		retval = Set(attribHash, structValue);
 	}
 

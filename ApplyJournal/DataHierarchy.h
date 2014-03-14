@@ -6,6 +6,10 @@
 //
 // (c) 2014 Graham West
 
+#if !defined(DATAHIERARCHY_H)
+#define DATAHIERARCHY_H
+
+// Library headers.
 #include <QMap>
 #include <QVariant>
 
@@ -16,8 +20,8 @@ class DataValue
 public:
 	enum Type {
 		INVALID = 0,
-		STRUCT = 1,
-		BASIC = 2
+		STRUCT,
+		BASIC
 	};
 	
 	DataValue();
@@ -75,3 +79,5 @@ private:
 	
 	ChildrenMap m_Children;
 };
+
+#endif // DATAHIERARCHY_H
