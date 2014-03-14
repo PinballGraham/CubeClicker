@@ -32,9 +32,14 @@ ApplyJournal {
 	OBJECTS_DIR = ApplyJournal/build
 
 	HEADERS += \
+		ApplyJournal/DataHierarchy.h \
+		ApplyJournal/DataReader.h \
+		ApplyJournal/DataWriter.h
 
 	SOURCES += \
-		ApplyJournal/main.cpp
-
+		ApplyJournal/main.cpp \
+		ApplyJournal/DataHierarchy.cpp \
+		ApplyJournal/DataReader.cpp \
+		ApplyJournal/DataWriter.cpp
 }
 
