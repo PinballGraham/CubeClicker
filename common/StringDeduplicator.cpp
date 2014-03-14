@@ -51,11 +51,25 @@ uint StringDeduplicator::Find(const QString& str)
 
 uint StringDeduplicator::Store(const QString& str)
 {
+	uint hash = qHash(str);
+
+	return Add(hash, str);
+}
+
+uint StringDeduplicator::StoreNoCase(const QString& str)
+{
+	QString lower = str.toLower();
+	uint hash = qHash(lower);
+
+	return Add(hash, str);
+}
+
+uint StringDeduplicator::Add(uint hash, const QString& str)
+{
 	StringDeduplicator* dedup = StringDeduplicator::Instance();
 	DeduplicatorMap::const_iterator iter = dedup->m_Strings.end();
 	
-	uint strHash = qHash(str);
-	iter = dedup->m_Strings.insert(strHash, str);
+	iter = dedup->m_Strings.insert(hash, str);
 	
 	return iter.key();
 }

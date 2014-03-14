@@ -19,11 +19,14 @@ public:
 
 	static uint Find(const QString& str);
 	static uint Store(const QString& str);
+	static uint StoreNoCase(const QString& str);
 	static const QString& Retrieve(uint hash);
 	
 	static int Total();
 	
 private:
+	static uint Add(uint hash, const QString& str);
+
 	static StringDeduplicator* m_Instance;
 	
 	typedef QMap<uint, QString> DeduplicatorMap;
