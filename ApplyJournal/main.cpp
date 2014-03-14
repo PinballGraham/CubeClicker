@@ -13,6 +13,9 @@
 #include <stdio.h>
 
 // Library headers.
+#include <QDateTime>
+#include <QDir>
+#include <QFileInfo>
 #include <QHash>
 #include <QMap>
 #include <QVector>
@@ -22,15 +25,79 @@
 
 // Application headers.
 #include "DataHierarchy.h"
+#include "DataReader.h"
+#include "DataWriter.h"
+
+typedef struct {
+	QString fileName;
+	DataHierarchy* hierarchy;
+	QDateTime loaded;
+} MasterEntry;
+
+typedef QMap<QString, MasterEntry> MasterMap;
+
+static MasterMap s_root;
+
+static QString FullFileName(const QString& relativeName)
+{
+	QFileInfo info(QDir::current(), relativeName);
+	return info.canonicalFilePath();
+}
+
+static bool ReadFile(const QString& fileName)
+{
+	bool retval = false;
+	QString fullName = FullFileName(fileName);
+
+	if (!fullName.isEmpty())
+	{
+		DataReader reader;
+		DataHierarchy* hierarchy;
+		
+		hierarchy = reader.Read(fullName);
+
+		if (hierarchy)
+		{
+			DataValue idVal = hierarchy->Value("id");
+
+			if (idVal.IsBasic())
+			{
+				QString id = idVal.BasicString();
+
+				MasterEntry newEntry;
+				newEntry.fileName = fileName;
+				newEntry.hierarchy = hierarchy;
+				newEntry.loaded = QDateTime::currentDateTime();
+
+				s_root.insert(id, newEntry);
+			}
+			else
+			{
+				// XXX: Report id-less file.
+				delete hierarchy;
+			}
+		}
+		else
+		{
+			// XXX: Report unreadable file.
+		}
+	}
+	else
+	{
+		// XXX: Report missing file.
+	}
+
+	return retval;
+}
 
 #if defined(TEST_FILENAMES)
-void TestApplyJournal()
+static void TestApplyJournal()
 {
-	QVector<QString> fileIDs;
 	// ../TestData/test.journal
 	// ../TestData/players.data
 	// ../TestData/layer.data
 	// ../TestData/master.data
+	ReadFile("../TestData/players.data");
 }
 #endif
 
@@ -50,7 +117,6 @@ static int ApplyJournal(int argc, char* argv[])
 		{
 			QString fileName(argv[count]);
 			// Read file by name, get ID
-			printf("%d: %s\n", count - 1, fileName.toLocal8Bit().data());
 		}
 		// Modify files with journal
 		for (int count = 2; count < argc; count++)
