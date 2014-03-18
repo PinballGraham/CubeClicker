@@ -102,15 +102,17 @@ bool DataWriter::WriteHierarchy(QTextStream& stream,
 bool DataWriter::LeadingComment(QTextStream& stream, const QDateTime& loaded) const
 {
 	stream << "# Processed by ApplyJournal:\n";
-	stream << "# Previous version read at \n";
-	stream << "\n";
+	stream << "# Previous version read at ";
+	stream << loaded.toString("yyyy-MM-dd hh:mm:ss");
+	stream << "\n\n";
 	return true;
 }
 
 bool DataWriter::TrailingComment(QTextStream& stream) const
 {
 	stream << "\n";
-	stream << "# New version written at \n";
+	stream << "# New version written at ";
+	stream << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 	return true;
 }
 
