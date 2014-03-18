@@ -297,7 +297,6 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 
 	termDest = m_currentLine.left(used);
 	m_currentLine = m_currentLine.remove(0, used);
-	printf("%d : '%s' : '%s'\n", retval, termDest.toLocal8Bit().data(), m_currentLine.toLocal8Bit().data());
 	return retval;
 }
 
