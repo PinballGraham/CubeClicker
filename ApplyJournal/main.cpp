@@ -7,8 +7,6 @@
 //
 // (c) 2014 Graham West
 
-#define TEST_FILENAMES
-
 // System headers.
 #include <stdio.h>
 
@@ -90,16 +88,18 @@ static bool ReadFile(const QString& fileName)
 	return retval;
 }
 
-#if defined(TEST_FILENAMES)
-static void TestApplyJournal()
+static int TestApplyJournal()
 {
+	int retval = 0;
+
 	// ../TestData/test.journal
 	// ../TestData/players.data
 	// ../TestData/layer.data
 	// ../TestData/master.data
+
 	ReadFile("../TestData/players.data");
+	return retval;
 }
-#endif
 
 static int ApplyJournal(int argc, char* argv[])
 {
@@ -136,11 +136,23 @@ static int ApplyJournal(int argc, char* argv[])
 int main(int argc, char *argv[])
 {
 	int retval = 0;
-	
-#if defined(TEST_FILENAMES)
-	TestApplyJournal();
-#else
-	if (argc < 3)
+	bool testMode = false;
+
+	if (argc == 2)
+	{
+		QString param(argv[1]);
+
+		if (param.compare("-test", Qt::CaseInsensitive) == 0)
+		{
+			testMode = true;
+		}
+	}
+
+	if (testMode)
+	{
+		retval = TestApplyJournal();
+	}
+	else if (argc < 3)
 	{
 		printf("%s: <journal file> <data file> [data file] ...\n", argv[0]);
 		retval = 1;
@@ -149,7 +161,6 @@ int main(int argc, char *argv[])
 	{
 		retval = ApplyJournal(argc, argv);
 	}
-#endif
 	
 	return retval;
 }
