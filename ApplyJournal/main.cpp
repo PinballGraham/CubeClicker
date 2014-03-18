@@ -88,6 +88,16 @@ static bool ReadFile(const QString& fileName)
 	return retval;
 }
 
+static bool WriteFile(const MasterEntry& entry)
+{
+	bool retval = false;
+	DataWriter writer;
+	QString outName = entry.fileName + ".new";
+	retval = writer.Write(entry.hierarchy, outName, entry.loaded);
+
+	return retval;
+}
+
 static int TestApplyJournal()
 {
 	int retval = 0;
@@ -98,6 +108,14 @@ static int TestApplyJournal()
 	// ../TestData/master.data
 
 	ReadFile("../TestData/players.data");
+
+	MasterMap::const_iterator iter = s_root.begin();
+	while (iter != s_root.end())
+	{
+		WriteFile(*iter);
+		iter++;
+	}
+
 	return retval;
 }
 
