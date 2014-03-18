@@ -9,6 +9,7 @@
 // Class header, always comes first.
 #include "DataHierarchy.h"
 
+// Common includes.
 #include "StringDeduplicator.h"
 
 static QString emptyStr("");

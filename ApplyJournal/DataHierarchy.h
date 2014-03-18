@@ -40,7 +40,7 @@ public:
 
 	uint BasicValue() const;
 	const QString& BasicString() const;
-	inline DataHierarchy* StructValue() const;
+	DataHierarchy* StructValue() const;
 
 private:
 
