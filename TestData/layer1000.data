@@ -1,0 +1,9 @@
+id=layer1000
+size=1000
+started=441806400
+cells = {
+  s_0017x0900={ order=1 player=10101 time=580 }
+  s_0018x0900={ order=2 player=10101 time=582 }
+  s_0018x0900={ order=4 player=10101 time=583 }
+  e_0280x0300={ order=3 player=10102 time=582 }
+}

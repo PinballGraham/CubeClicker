@@ -108,6 +108,8 @@ static int TestApplyJournal()
 	// ../TestData/master.data
 
 	ReadFile("../TestData/players.data");
+	ReadFile("../TestData/master.data");
+	ReadFile("../TestData/layer1000.data");
 
 	MasterMap::const_iterator iter = s_root.begin();
 	while (iter != s_root.end())
