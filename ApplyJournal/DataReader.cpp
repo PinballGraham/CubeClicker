@@ -99,7 +99,7 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 					if (m_Contexts.size() > 1)
 					{
 						m_Contexts.pop();
-						current = m_Contexts.pop();
+						current = m_Contexts.top();
 					}
 					else
 					{
@@ -233,8 +233,6 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 
 			while (!done && used < m_currentLine.length())
 			{
-				ch = m_currentLine[used];
-
 				if (inQuotes)
 				{
 					// We need to handle escape characters so we don't
@@ -271,9 +269,13 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 						{
 							inQuotes = true;
 						}
-
 						used++;
 					}
+				}
+
+				if (used < m_currentLine.length())
+				{
+					ch = m_currentLine[used];
 				}
 			}
 
