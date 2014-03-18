@@ -20,11 +20,37 @@ class DataReader
 {
 public:
 	enum Error {
-		NONE = 0,
-		MALFORMED_ATTRIBUTE,
-		CONTEXT_UNDERFLOW,
-		UNFINISHED_VALUE,
-		MORE_AFTER_VALUE
+		ERROR_OK = 0,
+		ERROR_MISSING_VALUE,
+		ERROR_UNFINISHED_VALUE,
+		ERROR_MALFORMED_ATTRIBUTE,
+		ERROR_MISSING_ATTRIBUTE,
+		ERROR_NO_EQUALS,
+		ERROR_CONTEXT_UNDERFLOW,
+		ERROR_UNKNOWN_TERM
+	};
+
+	enum Term {
+		OPEN_STRUCT = 0,
+		CLOSE_STRUCT,
+		EQUALS,
+		COMMENT,
+		END_OF_LINE,
+		ATTRIB_OR_VALUE,
+		VALUE_ONLY
+	};
+
+	enum ValueError {
+		VALUE_OK,
+		VALUE_MISSING_QUOTE,
+		VALUE_UNFINISHED_ESCAPE,
+		VALUE_UNQUOTED_ESCAPE
+	};
+
+	enum State {
+		STATE_CLOSE_OR_ATTRIB,
+		STATE_EQUALS,
+		STATE_VALUE_OR_OPEN
 	};
 
 	DataReader();
@@ -36,9 +62,13 @@ private:
 	DataReader(const DataReader& src);
 	DataReader& operator=(const DataReader& src);
 
-	Error ParseLine(QString line);
+	Error ParseLine(const QString& line);
+	Term NextTerm(QString& termDest);
+	ValueError UnquoteTerm(const QString& term, QString& termDest) const;
 
 	QStack<DataHierarchy*> m_Contexts;
+
+	QString m_currentLine;
 };
 
 #endif // DATAREADER_H
