@@ -205,24 +205,27 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 	m_currentLine = m_currentLine.trimmed();
 
 	QChar ch = m_currentLine[0];
-	used++;
 
 	if (!m_currentLine.isEmpty())
 	{
 		if (ch == '{')
 		{
+			used++;
 			retval = OPEN_STRUCT;
 		}
 		else if (ch == '}')
 		{
+			used++;
 			retval = CLOSE_STRUCT;
 		}
 		else if (ch == '=')
 		{
+			used++;
 			retval = EQUALS;
 		}
 		else if (ch == '#')
 		{
+			used++;
 			retval = COMMENT;
 		}
 		else
@@ -231,7 +234,7 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 			bool inQuotes = false;
 			bool valueOnly = false;
 
-			while (!done && used < m_currentLine.length())
+			while (!done && used <= m_currentLine.length())
 			{
 				if (inQuotes)
 				{
@@ -251,7 +254,6 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 				}
 				else
 				{
-					// 
 					if (ch == '#' || ch == '{' || ch == '}' || ch == '=' ||
 						ch.isSpace())
 					{
@@ -260,8 +262,10 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 					else
 					{
 						// Attributes cannot have quotes or escapes, to
-						// prevent confusion.
-						if (ch == '\\')
+						// prevent confusion. They also cannot have dots
+						// because those are used in the journal entries to
+						// find the attribute in the file and tree.
+						if (ch == '\\' || ch == '.')
 						{
 							valueOnly = true;
 						}
@@ -269,6 +273,7 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 						{
 							inQuotes = true;
 						}
+
 						used++;
 					}
 				}
@@ -292,6 +297,7 @@ DataReader::Term DataReader::NextTerm(QString& termDest)
 
 	termDest = m_currentLine.left(used);
 	m_currentLine = m_currentLine.remove(0, used);
+	printf("%d : '%s' : '%s'\n", retval, termDest.toLocal8Bit().data(), m_currentLine.toLocal8Bit().data());
 	return retval;
 }
 
