@@ -8,10 +8,10 @@
 // Class header, always comes first.
 #include "DataWriter.h"
 
-// Library includes.
+// Library headers.
 #include <QFile>
 
-// Common includes.
+// Common headers.
 #include "StringDeduplicator.h"
 
 // Number of spaces prepended to each line, per child depth.

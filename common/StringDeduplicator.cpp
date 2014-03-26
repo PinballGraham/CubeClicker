@@ -9,7 +9,7 @@
 // Class header, always comes first.
 #include "StringDeduplicator.h"
 
-// Library includes.
+// Library headers.
 #include <QHash>
 
 // Used when we're asked to retrieve something that hasn't been stored.

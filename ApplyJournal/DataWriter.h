@@ -8,7 +8,7 @@
 #if !defined(DATAWRITER_H)
 #define DATAWRITER_H
 
-// Library includes.
+// Library headers.
 #include <QDateTime>
 #include <QTextStream>
 

@@ -9,7 +9,7 @@
 #if !defined(JOURNALPARSER_H)
 #define JOURNALPARSER_H
 
-// Library includes.
+// Library headers.
 #include <QString>
 
 class JournalParser

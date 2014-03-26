@@ -8,9 +8,9 @@
 // Class header, always comes first.
 #include "DataFileTracker.h"
 
-// Library includes.
+// Library headers.
 
-// Common includes.
+// Common headers.
 #include "StringDeduplicator.h"
 
 DataFileTracker::DataFileTracker()

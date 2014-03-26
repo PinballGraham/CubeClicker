@@ -6,6 +6,7 @@
 //
 // (c) 2014 Graham West
 
+// Library headers.
 #include <QMap>
 #include <QString>
 

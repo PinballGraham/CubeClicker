@@ -10,7 +10,7 @@
 // Class header, always comes first.
 #include "DataReader.h"
 
-// Library includes.
+// Library headers.
 #include <QFile>
 
 static const qint64 MAX_LINE_LEN = 50000;

@@ -8,13 +8,13 @@
 #if !defined(DATAFILETRACKER_H)
 #define DATAFILETRACKER_H
 
-// Library includes.
+// Library headers.
 #include <QDateTime>
 #include <QMap>
 #include <QString>
 #include <QVector>
 
-// Application includes.
+// Application headers.
 #include "DataHierarchy.h"
 
 class DataFileTracker
