@@ -30,23 +30,6 @@ public:
 		ERROR_UNKNOWN_TERM
 	};
 
-	enum Term {
-		OPEN_STRUCT = 0,
-		CLOSE_STRUCT,
-		EQUALS,
-		COMMENT,
-		END_OF_LINE,
-		ATTRIB_OR_VALUE,
-		VALUE_ONLY
-	};
-
-	enum ValueError {
-		VALUE_OK,
-		VALUE_MISSING_QUOTE,
-		VALUE_UNFINISHED_ESCAPE,
-		VALUE_UNQUOTED_ESCAPE
-	};
-
 	enum State {
 		STATE_CLOSE_OR_ATTRIB,
 		STATE_EQUALS,
@@ -63,12 +46,9 @@ private:
 	DataReader& operator=(const DataReader& src);
 
 	Error ParseLine(const QString& line);
-	Term NextTerm(QString& termDest);
-	ValueError UnquoteTerm(const QString& term, QString& termDest) const;
 
 	QStack<DataHierarchy*> m_Contexts;
-
-	QString m_currentLine;
+	QString m_CurrentLine;
 };
 
 #endif // DATAREADER_H

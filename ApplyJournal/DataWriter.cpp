@@ -13,6 +13,7 @@
 
 // Common headers.
 #include "StringDeduplicator.h"
+#include "StringUtils.h"
 
 // Number of spaces prepended to each line, per child depth.
 static const uint DEFAULT_INDENT = 4;
@@ -78,7 +79,7 @@ bool DataWriter::WriteHierarchy(QTextStream& stream,
 				Indent(stream, depth * m_Indent);
 				stream << attribName;
 				stream << " = ";
-				stream << valueStr;
+				stream << StringUtils::QuoteTerm(valueStr);
 				stream << "\n";
 			}
 			else if (dval.IsStruct())

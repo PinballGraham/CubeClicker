@@ -13,9 +13,12 @@
 // Library headers.
 #include <QFile>
 
+// Common headers.
+#include "StringUtils.h"
+
 static const qint64 MAX_LINE_LEN = 50000;
 
-DataReader::DataReader() : m_currentLine("")
+DataReader::DataReader() : m_CurrentLine("")
 {
 }
 
@@ -46,7 +49,8 @@ DataHierarchy* DataReader::Read(const QString& fileName)
 
 			if (lineRead > 0)
 			{
-				err = ParseLine(QString(lineBuffer));
+				QString line(lineBuffer);
+				err = ParseLine(line);
 			}
 		}
 		
@@ -79,11 +83,11 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 	Error retval = ERROR_OK;
 	DataHierarchy* current = m_Contexts.top();
 
-	m_currentLine = fileLine.trimmed();
+	m_CurrentLine = fileLine.trimmed();
 	State currState = STATE_CLOSE_OR_ATTRIB;
 
 	QString termStr("");
-	Term currTerm = NextTerm(termStr);
+	StringUtils::Term currTerm = StringUtils::NextTerm(m_CurrentLine, termStr);
 	bool done = false;
 	QString attribName("");
 
@@ -92,7 +96,7 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 		switch (currState)
 		{
 			case STATE_CLOSE_OR_ATTRIB:
-				if (currTerm == CLOSE_STRUCT)
+				if (currTerm == StringUtils::CLOSE_STRUCT)
 				{
 					// The top of the stack is the context we are currently
 					// in, so it should never be empty.
@@ -107,17 +111,19 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 						done = true;
 					}
 				}
-				else if (currTerm == ATTRIB_OR_VALUE)
+				else if (currTerm == StringUtils::ATTRIB_OR_VALUE)
 				{
 					attribName = termStr;
 					currState = STATE_EQUALS;
 				}
-				else if (currTerm == COMMENT || currTerm == END_OF_LINE)
+				else if (currTerm == StringUtils::COMMENT ||
+					currTerm == StringUtils::END_OF_LINE)
 				{
 					// We're not partway through an attrib/value pair.
 					done = true;
 				}
-				else if (currTerm == OPEN_STRUCT || currTerm == EQUALS)
+				else if (currTerm == StringUtils::OPEN_STRUCT ||
+					currTerm == StringUtils::EQUALS)
 				{
 					retval = ERROR_MISSING_ATTRIBUTE;
 					done = true;
@@ -132,7 +138,7 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 
 			case STATE_EQUALS:
 				//
-				if (currTerm == EQUALS)
+				if (currTerm == StringUtils::EQUALS)
 				{
 					currState = STATE_VALUE_OR_OPEN;
 				}
@@ -146,14 +152,15 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 				break;
 
 			case STATE_VALUE_OR_OPEN:
-				if (currTerm == ATTRIB_OR_VALUE || currTerm == VALUE_ONLY)
+				if (currTerm == StringUtils::ATTRIB_OR_VALUE ||
+					currTerm == StringUtils::VALUE_ONLY)
 				{
 					QString unquotedTerm("");
-					ValueError verr = UnquoteTerm(termStr, unquotedTerm);
+					StringUtils::ValueError verr = StringUtils::UnquoteTerm(termStr, unquotedTerm);
 
-					if (verr == VALUE_OK)
+					if (verr == StringUtils::VALUE_OK)
 					{
-						current->Set(attribName, termStr);
+						current->Set(attribName, unquotedTerm);
 						currState = STATE_CLOSE_OR_ATTRIB;
 					}
 					else
@@ -162,7 +169,7 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 						done = true;
 					}
 				}
-				else if (currTerm == OPEN_STRUCT)
+				else if (currTerm == StringUtils::OPEN_STRUCT)
 				{
 					// This attribute is a structure rather than a simple
 					// value, so it needs to be added to the context stack
@@ -189,199 +196,10 @@ DataReader::Error DataReader::ParseLine(const QString& fileLine)
 
 		if (!done)
 		{
-			currTerm = NextTerm(termStr);
+			currTerm = StringUtils::NextTerm(m_CurrentLine, termStr);
 		}
 	}
 
 	return retval;
 }
 
-DataReader::Term DataReader::NextTerm(QString& termDest)
-{
-	Term retval = END_OF_LINE;
-	int used = 0;
-
-	termDest.clear();
-	m_currentLine = m_currentLine.trimmed();
-
-	QChar ch = m_currentLine[0];
-
-	if (!m_currentLine.isEmpty())
-	{
-		if (ch == '{')
-		{
-			used++;
-			retval = OPEN_STRUCT;
-		}
-		else if (ch == '}')
-		{
-			used++;
-			retval = CLOSE_STRUCT;
-		}
-		else if (ch == '=')
-		{
-			used++;
-			retval = EQUALS;
-		}
-		else if (ch == '#')
-		{
-			used++;
-			retval = COMMENT;
-		}
-		else
-		{
-			bool done = false;
-			bool inQuotes = false;
-			bool valueOnly = false;
-
-			while (!done && used <= m_currentLine.length())
-			{
-				if (inQuotes)
-				{
-					// We need to handle escape characters so we don't
-					// falsely use an escaped quote as a close quote.
-					if (ch == '"')
-					{
-						inQuotes = false;
-					}
-					else if (ch == '\\' && (used + 1) < m_currentLine.length())
-					{
-						// We don't care what's quoted, just skip over it.
-						used++;
-					}
-
-					used++;
-				}
-				else
-				{
-					if (ch == '#' || ch == '{' || ch == '}' || ch == '=' ||
-						ch.isSpace())
-					{
-						done = true;
-					}
-					else
-					{
-						// Attributes cannot have quotes or escapes, to
-						// prevent confusion. They also cannot have dots
-						// because those are used in the journal entries to
-						// find the attribute in the file and tree.
-						if (ch == '\\' || ch == '.')
-						{
-							valueOnly = true;
-						}
-						else if (ch == '"')
-						{
-							inQuotes = true;
-						}
-
-						used++;
-					}
-				}
-
-				if (used < m_currentLine.length())
-				{
-					ch = m_currentLine[used];
-				}
-			}
-
-			if (valueOnly)
-			{
-				retval = VALUE_ONLY;
-			}
-			else
-			{
-				retval = ATTRIB_OR_VALUE;
-			}
-		}
-	}
-
-	termDest = m_currentLine.left(used);
-	m_currentLine = m_currentLine.remove(0, used);
-	return retval;
-}
-
-DataReader::ValueError DataReader::UnquoteTerm(const QString& term,
-	QString& termDest) const
-{
-	ValueError retval = VALUE_OK;
-	bool done = false;
-	bool inQuotes = false;
-	bool ok = true;
-	int pos = 0;
-
-	termDest.clear();
-
-	// We have to build the results character by character because we want
-	// to skip quotes and escape characters in the middle of the term.
-	while (ok && !done)
-	{
-		if (inQuotes)
-		{
-			if (pos == term.length())
-			{
-				// Don't allow unmatched quotes.
-				done = true;
-				ok = false;
-				retval = VALUE_MISSING_QUOTE;
-			}
-			if (term[pos] == '"')
-			{
-				inQuotes = false;
-			}
-			else if (term[pos] == '\\')
-			{
-				// Escape must be followed by a character.
-				if ((pos + 1) < term.length())
-				{
-					pos++;
-					termDest.push_back(term[pos]);
-				}
-				else
-				{
-					done = true;
-					ok = false;
-					retval = VALUE_UNFINISHED_ESCAPE;
-				}
-			}
-			else
-			{
-				termDest.push_back(term[pos]);
-			}
-		}
-		else
-		{
-			// We're not inside quotes, so whitespace or EOL marks our end.
-			if (pos == term.length() || term[pos].isSpace())
-			{
-				done = true;
-			}
-			else if (term[pos] == '"')
-			{
-				inQuotes = true;
-			}
-			else if (term[pos] == '\\')
-			{
-				done = true;
-				retval = VALUE_UNQUOTED_ESCAPE;
-			}
-			else
-			{
-				termDest.push_back(term[pos]);
-			}
-		}
-
-		// We stopped at this character, no need to move on.
-		if (!done)
-		{
-			pos++;
-		}
-	}
-
-	if (!ok || pos <= 0)
-	{
-		// The line might have ended at an unmatched quote.
-		termDest.clear();
-	}
-
-	return retval;
-}
