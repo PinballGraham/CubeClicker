@@ -22,10 +22,14 @@ DESTDIR = bin
 OBJECTS_DIR = common/build
 
 HEADERS = \
-	common/StringDeduplicator.h
+	common/ErrorLogger.h \
+	common/StringDeduplicator.h \
+	common/StringUtils.h
 
 SOURCES = \
-	common/StringDeduplicator.cpp
+	common/ErrorLogger.cpp \
+	common/StringDeduplicator.cpp \
+	common/StringUtils.cpp
 
 ApplyJournal {
 	TARGET = ApplyJournal
