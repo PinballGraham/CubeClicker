@@ -26,6 +26,12 @@ Backend server\
 \'97\
 Receives commands (eg. pop this square, buy this powerup, use this powerup) from all connected player servers with their timestamps. Organises the commands into a strict time order and applies them one by one to the player database and cube layer. One command may cause several modifications to the game state (eg. use a big-tap powerup causes the number of big taps available to decrement and potentially multiple taps to happen). The command and all ensuing state changes are recorded as a single line of text, with a trailing checksum, and appended to the journal file.\
 \
+Coordinate system\
+\'97\
+The cube has six named sides; top, north, south, east, west and bottom. Viewed from above (ie. looking down at top), west is to the left and east to the right. The \'91home\'92 face for any cube is determined from the faces it touches by priority order: top, then north, then west, then east, then south and, lastly, bottom. This means that the bottom face has no edge cubes. 0,0 is always at the upper-left corner of a face when viewed head-on.\
+\
+All cubes have a unique numeric index. If the cube is n-large, the top face cubes are 0 to n^2-1, the north face cubes which don\'92t touch the top face are n^2 to 2n^2-n-1, the west face cubes which touch neither the top nor north faces are 2n^2-n to 3n^2-3n and so on.\
+\
 Journal processor\
 \'97\
 Loads the player and cube layer file and reads the journal file line by line. Each journal line has a checksum at the end. If a broken line is found the update stops and emits an error, the journal file will usually have to be fixed by hand.\
