@@ -1,4 +1,4 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1265
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf190
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;}
 {\colortbl;\red255\green255\blue255;}
 \margl1440\margr1440\vieww10800\viewh8400\viewkind0
@@ -10,9 +10,11 @@ This is my remake of Curiosity: What\'92s Inside The Cube? by 22 Cans. A giant c
 \
 Architecture\
 \'97\
-A graphical client (OS X and maybe iOS) lets the player view the current layer of the cube, zoom in and click individual squares to \'91pop\'92 them. The client shows activity by other users in realtime.\
+A graphical client (OS X and maybe iOS) lets the player view the current layer of the cube, zoom in and click individual squares to \'91pop\'92 them. The client shows activity by other users in realtime. This could be made with Unity since it supports run-time modification of textures.\
 \
 A text-mode test client (buildable on Linux as well as OS X) moves around the cube and taps squares, reporting its activity every 10 seconds or so on the console.\
+\
+A dispatcher receives initial client connections, chooses a player server based on load balancing and passes player server connection info and credentials back to the client. This allows queueing connections.\
 \
 A player server supports connections from multiple clients, receiving input and passing it to the backend server. It provides clients with the textures for the current and next cube layers. It regularly updates the clients with diffs and full updates of the current layer (or a subset depending how zoomed in they are).\
 \
@@ -26,6 +28,9 @@ Receives commands (eg. pop this square, buy this powerup, use this powerup) from
 \
 Journal processor\
 \'97\
-Loads the player and cube layer file and reads the journal file line by line. Each line has a checksum at the end. If a broken line is found the update stops and emits an error, The journal file will usually have to be fixed by hand.\
+Loads the player and cube layer file and reads the journal file line by line. Each journal line has a checksum at the end. If a broken line is found the update stops and emits an error, the journal file will usually have to be fixed by hand.\
 \
-Each journal line sets the value of one or more properties in the player and/or cube file.}
+Each journal line sets the value of one or more properties in the player and/or cube file. Properties are attribute=value pairs where the value is a simple string or a compound value represented by \{, zero or more properties (including compound properties) and \}. The cube and other data files must have an \'91id\'92 property at their top level, which is the name used in the journal file to find a particular property.\
+\
+Journal lines have at least one attribute=value pair, where the attribute name is of the form file_id.attribute.sub_attribute.sub_sub_attribute and so on, describing how to locate the specific attribute. If the attribute already exists its value is updated. If not, it is created along with any parent attributes (as compound values). Trying to set a simple value on an existing attribute with a compound value is an error and will require the journal file to be fixed.\
+}
