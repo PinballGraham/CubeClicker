@@ -11,6 +11,7 @@ QT -= gui
 TEMPLATE = app
 CONFIG += console
 CONFIG -= app_bundle
+CONFIG += debug
 
 CONFIG += \
 	ApplyJournal
@@ -32,14 +33,18 @@ ApplyJournal {
 	OBJECTS_DIR = ApplyJournal/build
 
 	HEADERS += \
+		ApplyJournal/DataFileTracker.h \
 		ApplyJournal/DataHierarchy.h \
 		ApplyJournal/DataReader.h \
-		ApplyJournal/DataWriter.h
+		ApplyJournal/DataWriter.h \
+		ApplyJournal/JournalParser.h
 
 	SOURCES += \
 		ApplyJournal/main.cpp \
+		ApplyJournal/DataFileTracker.cpp \
 		ApplyJournal/DataHierarchy.cpp \
 		ApplyJournal/DataReader.cpp \
-		ApplyJournal/DataWriter.cpp
+		ApplyJournal/DataWriter.cpp \
+		ApplyJournal/JournalParser.cpp
 }
 

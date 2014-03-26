@@ -11,30 +11,19 @@
 #include <stdio.h>
 
 // Library headers.
-#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
-#include <QHash>
-#include <QMap>
-#include <QVector>
 
 // Common headers.
 #include "StringDeduplicator.h"
 
 // Application headers.
+#include "DataFileTracker.h"
 #include "DataHierarchy.h"
 #include "DataReader.h"
 #include "DataWriter.h"
 
-typedef struct {
-	QString fileName;
-	DataHierarchy* hierarchy;
-	QDateTime loaded;
-} MasterEntry;
-
-typedef QMap<QString, MasterEntry> MasterMap;
-
-static MasterMap s_root;
+static DataFileTracker s_Files;
 
 static QString FullFileName(const QString& relativeName)
 {
@@ -61,13 +50,7 @@ static bool ReadFile(const QString& fileName)
 			if (idVal.IsBasic())
 			{
 				QString id = idVal.BasicString();
-
-				MasterEntry newEntry;
-				newEntry.fileName = fileName;
-				newEntry.hierarchy = hierarchy;
-				newEntry.loaded = QDateTime::currentDateTime();
-
-				s_root.insert(id, newEntry);
+				s_Files.Add(fileName, id, hierarchy);
 			}
 			else
 			{
@@ -88,12 +71,12 @@ static bool ReadFile(const QString& fileName)
 	return retval;
 }
 
-static bool WriteFile(const MasterEntry& entry)
+static bool WriteFile(const DataFileTracker::FileInfo& info)
 {
 	bool retval = false;
 	DataWriter writer;
-	QString outName = entry.fileName + ".new";
-	retval = writer.Write(entry.hierarchy, outName, entry.loaded);
+	QString outName = info.fileName + ".new";
+	retval = writer.Write(info.hierarchy, outName, info.loaded);
 
 	return retval;
 }
@@ -111,11 +94,12 @@ static int TestApplyJournal()
 	ReadFile("../TestData/master.data");
 	ReadFile("../TestData/layer1000.data");
 
-	MasterMap::const_iterator iter = s_root.begin();
-	while (iter != s_root.end())
+	DataFileTracker::FilesInfo files;
+	s_Files.Files(files);
+
+	for (int count = 0; count < files.count(); count++)
 	{
-		WriteFile(*iter);
-		iter++;
+		WriteFile(files[count]);
 	}
 
 	return retval;
