@@ -8,3 +8,5 @@ Debug/*
 */build/*
 
 *.new
+
+*.log

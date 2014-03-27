@@ -15,6 +15,7 @@
 #include <QFileInfo>
 
 // Common headers.
+#include "ErrorLogger.h"
 #include "StringDeduplicator.h"
 
 // Application headers.
@@ -90,6 +91,17 @@ static int TestApplyJournal()
 	// ../TestData/layer.data
 	// ../TestData/master.data
 
+	SystemLogger.Fatal("Fatal Error test");
+	SystemLogger.Verbose("Verbose debug test - shouldn't appear");
+	SystemLogger.Log(ErrorLogger::NONFATAL_ERROR, "%s (%d)", "Non-fatal via vsprintf", 42);
+	SystemLogger.Log((ErrorLogger::Severity)93, "Arbitrary severity");
+
+	ErrorLogger::Severity sev = SystemLogger.Verbosity();
+	SystemLogger.Verbosity(ErrorLogger::DEBUG);
+	QString dmesg("Debug message via QString");
+	SystemLogger.Debug(dmesg);
+	SystemLogger.Verbosity(sev);
+	
 	ReadFile("../TestData/players.data");
 	ReadFile("../TestData/master.data");
 	ReadFile("../TestData/layer1000.data");
@@ -142,6 +154,8 @@ int main(int argc, char *argv[])
 	int retval = 0;
 	bool testMode = false;
 
+	SystemLogger.Start("../Logs/ApplyJournal.log", "ApplyJournal v0.0");
+	
 	if (argc == 2)
 	{
 		QString param(argv[1]);
@@ -165,6 +179,8 @@ int main(int argc, char *argv[])
 	{
 		retval = ApplyJournal(argc, argv);
 	}
-	
+
+	SystemLogger.Stop("ApplyJournal v0.0");
+
 	return retval;
 }
