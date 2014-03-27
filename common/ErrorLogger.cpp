@@ -14,7 +14,7 @@
 
 ErrorLogger SystemLogger;
 
-ErrorLogger::ErrorLogger() : m_Verbosity(MESSAGE), m_FileName("")
+ErrorLogger::ErrorLogger() : m_Verbosity(MESSAGE), m_AbortOnFatal(false), m_FileName("")
 {
 }
 
@@ -26,7 +26,8 @@ ErrorLogger::~ErrorLogger()
 	}
 }
 
-bool ErrorLogger::Start(const QString& fileName, const QString& startMessage)
+bool ErrorLogger::Start(const QString& fileName, const QString& startMessage,
+	bool abortOnFatal)
 {
 	bool retval = false;
 
@@ -34,6 +35,7 @@ bool ErrorLogger::Start(const QString& fileName, const QString& startMessage)
 	{
 		m_LogFile.setFileName(fileName);
 		m_LogFile.open(QIODevice::Append | QIODevice::Text);
+		AbortOnFatal(abortOnFatal);
 
 		if (m_LogFile.isOpen())
 		{
@@ -51,6 +53,7 @@ bool ErrorLogger::Start(const QString& fileName, const QString& startMessage)
 				m_LogStream << startMessage;
 				m_LogStream << "\n     ***** START *****\n";
 			}
+
 			retval = true;
 		}
 	}
@@ -134,6 +137,12 @@ bool ErrorLogger::Log(ErrorLogger::Severity severity, const QString& logLine)
 		m_LogStream << " - ";
 		m_LogStream << logLine;
 		m_LogStream << '\n';
+	}
+
+	if (severity >= FATAL_ERROR && m_AbortOnFatal)
+	{
+		Stop("Aborting due to fatal error!");
+		exit(1);
 	}
 
 	return retval;

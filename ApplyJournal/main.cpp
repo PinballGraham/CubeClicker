@@ -91,6 +91,7 @@ static int TestApplyJournal()
 	// ../TestData/layer.data
 	// ../TestData/master.data
 
+#if 0
 	SystemLogger.Fatal("Fatal Error test");
 	SystemLogger.Verbose("Verbose debug test - shouldn't appear");
 	SystemLogger.Log(ErrorLogger::NONFATAL_ERROR, "%s (%d)", "Non-fatal via vsprintf", 42);
@@ -101,6 +102,9 @@ static int TestApplyJournal()
 	QString dmesg("Debug message via QString");
 	SystemLogger.Debug(dmesg);
 	SystemLogger.Verbosity(sev);
+	SystemLogger.AbortOnFatal(true);
+	SystemLogger.Fatal("Testing abort-on-fatal");
+#endif
 	
 	ReadFile("../TestData/players.data");
 	ReadFile("../TestData/master.data");

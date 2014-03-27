@@ -35,9 +35,12 @@ public:
 	~ErrorLogger();
 
 	inline void Verbosity(Severity newVerbosity) { m_Verbosity = newVerbosity; }
-	inline Severity Verbosity(void) const { return m_Verbosity; }
+	inline Severity Verbosity() const { return m_Verbosity; }
 
-	bool Start(const QString& fileName, const QString& startMessage);
+	inline void AbortOnFatal(bool newAbort) { m_AbortOnFatal = newAbort; }
+	inline bool AbortOnFatal() const { return m_AbortOnFatal; }
+
+	bool Start(const QString& fileName, const QString& startMessage, bool abortOnFatal = false);
 	bool Stop(const QString& stopMessage);
 
 	bool Log(Severity severity, const QString& logLine);
@@ -62,6 +65,7 @@ private:
 	ErrorLogger& operator=(const ErrorLogger& src);
 
 	Severity m_Verbosity;
+	bool m_AbortOnFatal;
 
 	QString m_FileName;
 	QFile m_LogFile;
